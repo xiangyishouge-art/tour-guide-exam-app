@@ -1,111 +1,46 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#f5f7fb" />
-  <title>导游证备考助手 V1</title>
-  <style>
-    :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--primary:#2563eb;--primary2:#1d4ed8;--line:#e6eaf0;--ok:#16a34a;--bad:#dc2626;--shadow:0 8px 28px rgba(20,30,55,.07)}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-    button{font:inherit}.app{min-height:100vh}.top{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-    .nav{max-width:1100px;margin:auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;font-size:19px}.navlinks{display:flex;gap:6px}
-    .navbtn{border:0;background:transparent;padding:9px 12px;border-radius:10px;color:var(--muted);cursor:pointer}.navbtn.active{background:#eaf1ff;color:var(--primary);font-weight:700}
-    .wrap{max-width:1100px;margin:auto;padding:24px 18px 60px}.hero{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;border-radius:22px;padding:28px;box-shadow:var(--shadow);margin-bottom:20px}
-    .hero h1{margin:0 0 8px;font-size:30px}.hero p{margin:0;color:#dbeafe}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
-    .stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:14px;border-radius:14px}.stat b{display:block;font-size:23px;margin-bottom:4px}.stat span{font-size:12px;color:#dbeafe}
-    .section-title{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}.section-title h2{font-size:20px;margin:0}.link{color:var(--primary);cursor:pointer;border:0;background:none}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
-    .subject{cursor:pointer;transition:.15s}.subject:hover{transform:translateY(-2px)}.subject .icon{font-size:30px}.subject h3{margin:10px 0 5px}.subject p{color:var(--muted);font-size:14px;margin:0 0 14px}
-    .bar{height:7px;background:#edf0f5;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--primary);border-radius:99px}.small{font-size:12px;color:var(--muted);margin-top:7px}
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.select,.btn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 13px;cursor:pointer}.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn.danger{color:var(--bad)}
-    .question{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}.qmeta{color:var(--muted);font-size:13px;margin-bottom:12px}.qtitle{font-size:19px;line-height:1.6;font-weight:700}
-    .options{display:grid;gap:10px;margin-top:18px}.option{text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:13px;cursor:pointer}.option:hover{border-color:#a9c2f7}.option.selected{border-color:var(--primary);background:#eff6ff}.option.correct{border-color:var(--ok);background:#f0fdf4}.option.wrong{border-color:var(--bad);background:#fef2f2}
-    .explain{margin-top:16px;padding:14px;border-radius:12px;background:#f7f8fb;color:#465066;line-height:1.7}.result{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px}
-    .empty{text-align:center;padding:40px 15px;color:var(--muted)}.wrongitem{display:flex;justify-content:space-between;gap:12px;align-items:center}.wrongitem+.wrongitem{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
-    .tag{display:inline-block;background:#eef2ff;color:#4355b9;border-radius:99px;padding:4px 8px;font-size:12px;margin-right:5px}.footer{text-align:center;color:#9aa3b2;font-size:12px;margin-top:35px}
-    @media(max-width:700px){.nav{padding:11px 12px}.brand{font-size:16px}.navbtn{padding:8px}.wrap{padding:15px 12px 45px}.hero{padding:22px;border-radius:18px}.hero h1{font-size:25px}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.card{padding:17px}.qtitle{font-size:17px}}
-  </style>
-</head>
-<body>
-<div id="app"></div>
-<script>
-const SUBJECTS=[
- {id:"law",name:"政策与法律法规",icon:"⚖️",desc:"旅游政策、法律法规与行业规范"},
- {id:"guide",name:"导游业务",icon:"🧭",desc:"导游服务流程、技能与应急处理"},
- {id:"national",name:"全国导游基础知识",icon:"🏛️",desc:"中国历史、文化、地理与民俗"},
- {id:"local",name:"地方导游基础知识",icon:"🗺️",desc:"地方概况、景观、文化与旅游资源"}
-];
-
-const QUESTIONS=[
- {id:1,s:"law",type:"single",q:"我国旅游法中规定，旅游者与旅游经营者发生争议时，可以通过多种途径解决。下列属于法定争议解决途径的是？",o:["协商","随意曝光对方个人信息","强制扣留经营者财物","组织网络攻击"],a:0,e:"旅游争议可以通过协商、调解、仲裁、诉讼等合法途径解决。"},
- {id:2,s:"law",type:"single",q:"旅行社为旅游者提供服务时，应当按照约定提供相应服务。这里体现了旅游经营活动中的哪项基本要求？",o:["诚实信用","无限免责","强制消费","随意变更合同"],a:0,e:"诚实信用原则贯穿旅游合同履行和旅游经营活动。"},
- {id:3,s:"guide",type:"single",q:"导游在接待旅游团队时，首先应重点做好哪项工作？",o:["核实团队及接待信息","立即推销纪念品","自行改变行程","拒绝回答游客问题"],a:0,e:"接团前后核实团队信息、接待安排和游客情况，是保证服务顺利进行的重要基础。"},
- {id:4,s:"guide",type:"single",q:"旅游团队发生突发情况时，导游处理问题的一般原则是？",o:["保持冷静并及时报告、妥善处理","隐瞒情况","把责任全部推给游客","立即离开现场"],a:0,e:"突发事件处理中应保持冷静，及时报告，根据实际情况采取合理措施并做好沟通。"},
- {id:5,s:"national",type:"single",q:"我国世界文化遗产之一的故宫位于？",o:["北京","西安","杭州","成都"],a:0,e:"故宫位于北京市，是中国古代宫殿建筑的代表。"},
- {id:6,s:"national",type:"single",q:"中国传统节日中，有赛龙舟、吃粽子等习俗的是？",o:["端午节","中秋节","重阳节","清明节"],a:0,e:"端午节的传统习俗包括赛龙舟、吃粽子等。"},
- {id:7,s:"local",type:"single",q:"广东省省会是？",o:["广州","深圳","珠海","佛山"],a:0,e:"广州是广东省省会，也是重要的历史文化名城和旅游城市。"},
- {id:8,s:"local",type:"single",q:"广州具有代表性的历史文化景点是？",o:["陈家祠","布达拉宫","兵马俑","拙政园"],a:0,e:"陈家祠是广州具有代表性的传统岭南建筑和民俗文化景观。"},
- {id:9,s:"guide",type:"judge",q:"导游服务中，导游可以不考虑游客的合理需求，只按照自己的习惯安排行程。",o:["正确","错误"],a:1,e:"错误。导游应按照合同约定和相关规范提供服务，并合理关注游客需求。"},
- {id:10,s:"law",type:"judge",q:"旅游经营者在提供服务时应当遵守相关法律法规，并保障旅游者的合法权益。",o:["正确","错误"],a:0,e:"正确。这是旅游经营活动应遵循的基本要求。"}
-];
-
-const KEY="tourGuideExamV1";
-let state=JSON.parse(localStorage.getItem(KEY)||'{"wrong":[],"favorite":[],"answered":0,"correct":0,"streak":0}');
-let view="home",subjectId=null,index=0,selected=null,submitted=false,practiceList=[];
-
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-function pct(){return state.answered?Math.round(state.correct/state.answered*100):0}
-function subjectStats(id){let qs=QUESTIONS.filter(x=>x.s===id), answered=qs.filter(x=>state.wrong.includes(x.id)).length; return {total:qs.length,wrong:answered}}
-function subjectName(id){return SUBJECTS.find(x=>x.id===id)?.name||""}
-function setView(v){view=v;render()}
-function startPractice(id=null){
- subjectId=id; practiceList=id?QUESTIONS.filter(q=>q.s===id):[...QUESTIONS].sort(()=>Math.random()-.5);
- index=0;selected=null;submitted=false;view="practice";render()
-}
-function answer(i){if(submitted)return;selected=i;render()}
-function submit(){
- if(selected===null)return;
- const q=practiceList[index]; state.answered++; if(selected===q.a)state.correct++;
- state.wrong=state.wrong.filter(x=>x!==q.id); if(selected!==q.a)state.wrong.push(q.id);
- save(); submitted=true; render()
-}
-function next(){if(index<practiceList.length-1){index++;selected=null;submitted=false;render()}else{view="home";render()}}
-function toggleFav(id){state.favorite=state.favorite.includes(id)?state.favorite.filter(x=>x!==id):[...state.favorite,id];save();render()}
-function render(){
- const app=document.getElementById("app");
- app.innerHTML=`<header class="top"><div class="nav"><div class="brand">🧭 导游证备考助手</div><div class="navlinks">
- <button class="navbtn ${view==="home"?"active":""}" onclick="setView('home')">首页</button>
- <button class="navbtn ${view==="practice"?"active":""}" onclick="startPractice()">练习</button>
- <button class="navbtn ${view==="wrong"?"active":""}" onclick="setView('wrong')">错题本</button>
- </div></div></header><main class="wrap">${view==="home"?home():view==="practice"?practice():wrong()}</main>`;
-}
-function home(){
- return `<section class="hero"><h1>导游证备考助手 V1</h1><p>四科练习 · 错题记录 · 学习统计 · iPad/手机适配</p>
- <div class="stats"><div class="stat"><b>${state.answered}</b><span>累计作答</span></div><div class="stat"><b>${state.correct}</b><span>答对题数</span></div><div class="stat"><b>${pct()}%</b><span>总体正确率</span></div><div class="stat"><b>${state.wrong.length}</b><span>错题数量</span></div></div></section>
- <div class="section-title"><h2>四科练习</h2><button class="link" onclick="startPractice()">随机练习 →</button></div>
- <div class="grid">${SUBJECTS.map(s=>{let st=subjectStats(s.id),master=st.total?Math.max(0,100-Math.round(st.wrong/st.total*100)):0;return `<div class="card subject" onclick="startPractice('${s.id}')"><div class="icon">${s.icon}</div><h3>${s.name}</h3><p>${s.desc}</p><div class="bar"><i style="width:${master}%"></i></div><div class="small">${st.total} 道示例题 · 点击开始练习</div></div>`}).join("")}</div>
- <div class="section-title"><h2>学习功能</h2></div><div class="grid">
- <div class="card"><h3>📕 错题本</h3><p>自动保存答错题目，方便集中复习。</p><button class="btn" onclick="setView('wrong')">查看错题</button></div>
- <div class="card"><h3>⭐ 收藏题</h3><p>收藏重要题目，便于考前快速回顾。</p><button class="btn" onclick="alert('V1 已预留收藏数据结构；在练习题中可继续扩展收藏入口。')">我的收藏 ${state.favorite.length}</button></div>
- </div><div class="footer">V1 演示题库仅用于功能测试，不代表官方考试题库。</div>`;
-}
-function practice(){
- if(!practiceList.length)return `<div class="card empty">暂无题目</div>`;
- const q=practiceList[index],right=submitted&&selected===q.a;
- return `<div class="toolbar"><button class="btn" onclick="setView('home')">← 返回首页</button><button class="btn" onclick="toggleFav(${q.id})">${state.favorite.includes(q.id)?"★ 已收藏":"☆ 收藏"}</button><span class="tag">${subjectName(q.s)}</span><span class="tag">${q.type==="judge"?"判断题":"单选题"}</span></div>
- <div class="question"><div class="qmeta">第 ${index+1} / ${practiceList.length} 题</div><div class="qtitle">${q.q}</div>
- <div class="options">${q.o.map((x,i)=>{let cls="option";if(submitted&&i===q.a)cls+=" correct";if(submitted&&selected===i&&i!==q.a)cls+=" wrong";if(!submitted&&selected===i)cls+=" selected";return `<button class="${cls}" onclick="answer(${i})">${String.fromCharCode(65+i)}. ${x}</button>`}).join("")}</div>
- ${submitted?`<div class="explain"><b>${right?"回答正确":"回答错误"}</b><br>正确答案：${String.fromCharCode(65+q.a)}. ${q.o[q.a]}<br>${q.e}</div>`:""}
- <div class="result">${!submitted?`<button class="btn primary" onclick="submit()">提交答案</button>`:`<button class="btn primary" onclick="next()">${index<practiceList.length-1?"下一题":"完成练习"}</button>`}<span class="small">错题会自动记录到错题本</span></div></div>`;
-}
-function wrong(){
- const qs=QUESTIONS.filter(q=>state.wrong.includes(q.id));
- return `<div class="section-title"><h2>📕 错题本</h2><button class="btn" onclick="setView('home')">返回首页</button></div>
- <div class="card">${qs.length?qs.map(q=>`<div class="wrongitem"><div><span class="tag">${subjectName(q.s)}</span><b>${q.q}</b><div class="small">正确答案：${String.fromCharCode(65+q.a)}. ${q.o[q.a]}</div></div><button class="btn" onclick="startWrong(${q.id})">练习</button></div>`).join(""):`<div class="empty">暂无错题。继续练习，错题会自动出现在这里。</div>`}</div>`;
-}
-function startWrong(id){subjectId=null;practiceList=QUESTIONS.filter(q=>q.id===id);index=0;selected=null;submitted=false;view="practice";render()}
-render();
-</script>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2563eb"><title>导游证备考助手 V2</title><style>*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}.app{max-width:900px;margin:auto;min-height:100vh}header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #e5e7eb;padding:13px 16px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:800;font-size:19px}nav button{border:0;background:transparent;padding:8px;border-radius:9px;color:#64748b}nav .on{background:#e8f0ff;color:#2563eb;font-weight:700}main{padding:14px}.hero{background:linear-gradient(135deg,#2563eb,#4f7ff0);color:#fff;border-radius:22px;padding:22px;margin-bottom:16px}.hero h1{margin:0 0 7px;font-size:28px}.hero p{margin:0 0 16px;opacity:.9}.stats,.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stats{grid-template-columns:repeat(4,1fr)}.stat{background:#ffffff20;border:1px solid #ffffff30;padding:12px;border-radius:14px}.stat b{display:block;font-size:22px}.card,.question,.wrong{background:#fff;border:1px solid #e4e9f0;border-radius:18px;padding:17px}.card h3{margin:8px 0}.muted{color:#718096;font-size:14px}.primary,.secondary,.danger{border:0;border-radius:11px;padding:10px 14px}.primary{background:#2563eb;color:#fff}.secondary{background:#edf2f7;color:#334155}.danger{background:#fee2e2;color:#b91c1c}.filters{display:flex;gap:7px;overflow:auto;margin:10px 0 15px}.filters button{white-space:nowrap;border:1px solid #dbe2ea;background:#fff;border-radius:999px;padding:8px 12px}.filters .on{background:#2563eb;color:#fff}.tag{display:inline-block;background:#eef4ff;color:#2563eb;padding:5px 8px;border-radius:7px;font-size:12px;margin-right:5px}.qtext{font-size:19px;font-weight:700;line-height:1.6;margin:16px 0}.opt{width:100%;text-align:left;background:#fff;border:1px solid #dbe2ea;padding:13px;border-radius:12px;margin:6px 0}.opt.sel{border-color:#2563eb;background:#eff6ff}.opt.ok{border-color:#16a34a;background:#f0fdf4}.opt.bad{border-color:#dc2626;background:#fef2f2}.explain{background:#f8fafc;padding:13px;border-radius:11px;margin-top:13px;line-height:1.6}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.progress{height:7px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin:10px 0}.progress i{display:block;height:100%;background:#2563eb}footer{text-align:center;color:#94a3b8;font-size:12px;padding:28px 15px}@media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.hero h1{font-size:25px}.qtext{font-size:18px}header{padding:11px 12px}nav button{padding:7px 6px}main{padding:11px}}</style></head><body><div class="app"><header><div class="brand">🧭 导游证备考助手</div><nav id="nav"></nav></header><main id="app"></main><footer>V2 原创练习题演示版 · 不代表官方考试题库</footer></div><script>
+const Q=[
+['政策与法律法规','旅游法基础','《中华人民共和国旅游法》所称旅游经营者通常包括？',['旅行社','普通游客','旅游者家属','旅游志愿者'],0,'旅行社等依法向旅游者提供旅游服务的主体属于旅游经营者。'],
+['政策与法律法规','旅游安全','旅游经营者应当重视旅游者的人身、财产安全。',['正确','错误'],0,'安全保障是旅游经营活动的重要要求。'],
+['政策与法律法规','消费者权益','旅游者可以依法要求旅游经营者按照约定提供服务。',['正确','错误'],0,'旅游者依法享有合同约定服务等权益。'],
+['政策与法律法规','合同与旅行社','旅行社履行旅游合同时应当？',['按照约定提供服务','擅自降低标准','强制增加项目','随意取消行程'],0,'旅行社应按照合同约定履行义务。'],
+['政策与法律法规','旅游投诉','旅游者维权不应采取的方式是？',['协商','投诉','仲裁或诉讼','自行扣留他人财物'],3,'维权应通过合法途径。'],
+['政策与法律法规','旅游市场秩序','不合理低价游可能伴随强迫购物等问题。',['正确','错误'],0,'规范旅游市场秩序的重要内容之一就是治理不合理低价游。'],
+['政策与法律法规','导游人员管理','导游应当引导旅游者文明旅游。',['正确','错误'],0,'文明旅游引导属于导游服务的重要内容。'],
+['政策与法律法规','资源保护','旅游发展应兼顾资源保护与合理利用。',['正确','错误'],0,'旅游资源保护与合理利用需要统筹考虑。'],
+['导游业务','服务程序','地陪接团前的重要准备是？',['熟悉接待计划','临时决定行程','不查看游客信息','取消讲解准备'],0,'熟悉接待计划、掌握团队情况是接团前的重要准备。'],
+['导游业务','导游讲解','导游讲解应根据游客特点调整表达方式。',['正确','错误'],0,'因人而异可以提高讲解效果。'],
+['导游业务','团队管理','团队中出现游客迟到，导游较合理的处理方式是？',['了解情况并协调','立即丢下游客','让全团自行解决','取消全部服务'],0,'应兼顾团队行程并及时沟通协调。'],
+['导游业务','安全服务','游客突发身体不适时，导游应？',['根据情况救助并联系相关人员','忽视','强迫继续游览','让游客独自处理'],0,'应优先关注游客安全并采取必要措施。'],
+['导游业务','游客关系','导游服务中应尊重游客的风俗习惯和宗教信仰。',['正确','错误'],0,'尊重差异是导游职业素养的重要内容。'],
+['导游业务','交通服务','旅游大巴行程中导游应重点做好？',['安全提醒和行程协调','鼓励随意走动','忽略集合时间','不与司机沟通'],0,'交通环节应重视安全和组织协调。'],
+['导游业务','职业素养','导游职业素养的基础表现之一是？',['守时守信','随意迟到','拒绝沟通','态度冷漠'],0,'守时、守信、礼貌沟通是基础职业素养。'],
+['导游业务','服务质量','游客提出合理需求时，导游应？',['耐心了解并协调','立即拒绝','嘲笑游客','不予回应'],0,'应在职责范围内积极协调合理需求。'],
+['全国导游基础知识','中国地理','我国地势总体特点是？',['西高东低','东高西低','完全平坦','南高北低且无山地'],0,'我国地势总体西高东低，呈阶梯状分布。'],
+['全国导游基础知识','历史文化','传统意义上的中国四大发明包括？',['造纸术、印刷术、火药、指南针','茶叶、丝绸、瓷器、玉器','算盘、围棋、书法、绘画','青铜器、陶器、漆器、玉器'],0,'传统意义上的四大发明为造纸术、印刷术、火药和指南针。'],
+['全国导游基础知识','传统建筑','木结构是中国传统建筑的重要结构形式之一。',['正确','错误'],0,'木构建筑在中国传统建筑史中占有重要地位。'],
+['全国导游基础知识','饮食文化','地域环境会影响地方饮食文化。',['正确','错误'],0,'气候、物产、历史和生活习惯都会影响饮食文化。'],
+['全国导游基础知识','民族文化','我国民族文化具有多样性。',['正确','错误'],0,'不同民族形成了丰富多样的传统文化和风俗。'],
+['全国导游基础知识','园林文化','借景、框景等常见于哪类传统艺术？',['中国古典园林','现代工业设计','交通规划','商业营销'],0,'借景、框景是中国传统园林的造景手法。'],
+['全国导游基础知识','旅游资源','山岳景观属于自然旅游资源。',['正确','错误'],0,'山岳景观属于典型自然旅游资源。'],
+['全国导游基础知识','文化遗产','传统节日可以作为旅游文化讲解的重要内容。',['正确','错误'],0,'传统节日与民俗和文化传承密切相关。'],
+['地方导游基础知识','广东概况','广东省简称“粤”，省会是？',['广州','深圳','珠海','佛山'],0,'广东省省会为广州。'],
+['地方导游基础知识','岭南文化','岭南文化的重要地域组成包括？',['广府、潮汕、客家等文化','只有一种地方文化','完全没有饮食文化','与海外交流无关'],0,'广府、潮汕、客家等共同构成岭南文化的重要部分。'],
+['地方导游基础知识','广东资源','广东既有滨海旅游资源，也有山地森林资源。',['正确','错误'],0,'广东自然环境多样，兼具滨海、山地、森林等资源。'],
+['地方导游基础知识','广东饮食','粤菜通常具有怎样的特点？',['选料广泛、讲究鲜味和技法','只用辛辣口味','完全不使用海鲜','没有地域特色'],0,'粤菜具有鲜明岭南特色，讲究选料、鲜味和烹饪技法。'],
+['地方导游基础知识','广东景观','丹霞山位于广东哪个城市？',['韶关','湛江','汕尾','江门'],0,'丹霞山位于广东韶关。'],
+['地方导游基础知识','广东文化','粤剧是广东具有代表性的传统戏曲艺术。',['正确','错误'],0,'粤剧是岭南传统文化的重要代表。'],
+['地方导游基础知识','广东城市','珠海具有代表性的旅游资源类型包括？',['滨海旅游资源','冰川','高原草甸','沙漠绿洲'],0,'珠海位于珠江口，滨海旅游资源突出。'],
+['地方导游基础知识','广东文化','岭南建筑、园林和饮食都可以成为地方导游讲解素材。',['正确','错误'],0,'这些内容都能体现岭南地域文化特色。']
+].map((x,i)=>({id:i+1,subject:x[0],chapter:x[1],q:x[2],options:x[3],answer:x[4],explain:x[5],type:x[3].length==2?'判断题':'单选题'}));
+const subs=['全部','政策与法律法规','导游业务','全国导游基础知识','地方导游基础知识'];const KEY='tourGuideExamV2';let S=JSON.parse(localStorage.getItem(KEY)||'null')||{a:0,c:0,wrong:[],fav:[],stats:{}};let view='home',pool=[],i=0,sel=null,done=false,mode='practice';
+const save=()=>localStorage.setItem(KEY,JSON.stringify(S)),rate=()=>S.a?Math.round(S.c/S.a*100):0;
+function go(v){view=v;render()}function nav(){navEl.innerHTML=['home:首页','practice:练习','wrong:错题本','stats:统计'].map(z=>{let[a,b]=z.split(':');return `<button class="${view==a?'on':''}" onclick="go('${a}')">${b}</button>`}).join('')};const navEl=document.getElementById('nav'),app=document.getElementById('app');
+function home(){app.innerHTML=`<section class=hero><h1>导游证备考助手 V2</h1><p>四科练习 · 章节刷题 · 错题收藏 · 模拟考试 · 学习统计</p><div class=stats><div class=stat><b>${S.a}</b>累计作答</div><div class=stat><b>${S.c}</b>答对题数</div><div class=stat><b>${rate()}%</b>总体正确率</div><div class=stat><b>${S.wrong.length}</b>错题数量</div></div></section><div class="card"><h2>四科练习</h2><div class=grid>${subs.slice(1).map((s,n)=>`<div class=card><div style="font-size:27px">${['⚖️','🧭','🏛️','🌏'][n]}</div><h3>${s}</h3><p class=muted>${Q.filter(q=>q.subject==s).length} 道演示题</p><button class=primary onclick="startSub('${s}')">开始练习</button></div>`).join('')}</div></div><br><div class=grid><div class=card><h3>🎯 模拟考试</h3><p class=muted>随机抽取 20 题</p><button class=secondary onclick=startExam()>开始模拟</button></div><div class=card><h3>⭐ 我的收藏</h3><p class=muted>${S.fav.length} 道收藏</p><button class=secondary onclick=startFav()>练习收藏</button></div></div>`}
+function startSub(s){pool=Q.filter(q=>q.subject==s);mode='practice';i=0;sel=null;done=false;view='practice';render()}function startFav(){pool=Q.filter(q=>S.fav.includes(q.id));mode='practice';i=0;sel=null;done=false;view='practice';render()}function startExam(){pool=[...Q].sort(()=>Math.random()-.5).slice(0,20);mode='exam';i=0;sel=null;done=false;view='practice';render()}
+function practice(){if(!pool.length){app.innerHTML='<div class=card><h2>暂无题目</h2><button class=primary onclick="go(\'home\')">返回首页</button></div>';return}let q=pool[i];app.innerHTML=`<div class="actions"><button class=secondary onclick="go('home')">← 首页</button><span class=muted>${mode==='exam'?'模拟考试':'章节练习'} · ${i+1}/${pool.length}</span></div><div class=progress><i style="width:${i/pool.length*100}%"></i></div><div class=question><span class=tag>${q.subject}</span><span class=tag>${q.chapter}</span><span class=tag>${q.type}</span><div class=qtext>${q.q}</div>${q.options.map((o,n)=>`<button class="opt ${done?(n===q.answer?'ok':n===sel?'bad':''):n===sel?'sel':''}" ${done?'disabled':''} onclick="pick(${n})">${String.fromCharCode(65+n)}. ${o}</button>`).join('')}<div class=actions>${done?`<button class=primary onclick=next()>${i<pool.length-1?'下一题':'完成练习'}</button>`:`<button class=primary onclick=submit()>提交答案</button>`}<button class=secondary onclick=fav()>${S.fav.includes(q.id)?'⭐ 已收藏':'☆ 收藏'}</button></div>${done?`<div class=explain><b>${sel===q.answer?'✅ 回答正确':'❌ 回答错误'}</b><br>${q.explain}</div>`:''}</div>`}
+function pick(n){if(!done){sel=n;render()}}function submit(){if(sel===null){alert('请先选择答案');return}let q=pool[i],ok=sel===q.answer;S.a++;if(ok)S.c++;S.stats[q.subject]??={a:0,c:0};S.stats[q.subject].a++;if(ok)S.stats[q.subject].c++;if(!ok&&!S.wrong.includes(q.id))S.wrong.push(q.id);save();done=true;render()}function next(){if(i<pool.length-1){i++;sel=null;done=false;render()}else{alert('本轮练习完成！');go('home')}}function fav(){let id=pool[i].id,p=S.fav.indexOf(id);p>=0?S.fav.splice(p,1):S.fav.push(id);save();render()}
+function wrong(){let qs=Q.filter(q=>S.wrong.includes(q.id));app.innerHTML=`<div class=actions><h2 style="margin-right:auto">❌ 错题本（${qs.length}）</h2>${qs.length?'<button class=primary onclick=startWrong()>开始错题练习</button><button class=danger onclick=clearWrong()>清空</button>':''}</div><div class=grid>${qs.length?qs.map(q=>`<div class=wrong><b>${q.q}</b><p class=muted>${q.subject} · ${q.chapter}</p><p>答案：${q.options[q.answer]}</p></div>`).join(''):'<div class=card><h3>🎉 暂无错题</h3><p class=muted>做题后系统会自动记录错题。</p></div>'}</div>`}function startWrong(){pool=Q.filter(q=>S.wrong.includes(q.id));mode='practice';i=0;sel=null;done=false;view='practice';render()}function clearWrong(){if(confirm('确定清空错题本吗？')){S.wrong=[];save();render()}}
+function stats(){app.innerHTML=`<h2>📊 学习统计</h2><div class=grid>${subs.slice(1).map(s=>{let x=S.stats[s]||{a:0,c:0};let p=x.a?Math.round(x.c/x.a*100):0;return `<div class=card><h3>${s}</h3><p>作答 ${x.a} · 正确 ${x.c}</p><div class=progress><i style="width:${p}%"></i></div><b>${p}%</b></div>`}).join('')}</div><br><div class=card><h3>总览</h3><p>累计作答：${S.a}</p><p>答对题数：${S.c}</p><p>总体正确率：${rate()}%</p><p>错题：${S.wrong.length} · 收藏：${S.fav.length}</p></div>`}
+function render(){nav();view==='home'?home():view==='practice'?practice():view==='wrong'?wrong():stats()}render();
+</script></body></html>
